@@ -41,13 +41,24 @@ def register(request):
 
 def login(request):
 	if request.method == 'POST':
-		print('submitted')
-		return redirect('login')
+		username = request.POST['username']
+		password = request.POST['password']
+		user = auth.authenticate(username=username,password=password)
+		if user is not None:
+			auth.login(request,user)
+			messages.success(request,'logged In successfully')
+			return redirect('dashboard')
+		else:
+			messages.error(request,'user not found')
+			return redirect('login')
 	else:
 		return render(request, 'accounts/login.html')
 
 def logout(request):
-	return redirect('index')
+	if request.method == 'POST':
+		auth.logout(request)
+		messages.success(request,'you have successfully logout')
+		return redirect('index')
 
 def dashboard(request):
 	return render(request, 'accounts/dashboard.html')
